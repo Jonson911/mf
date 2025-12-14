@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>魔法合成屋 ✨ Magic Merge</title>
+    <title>吉伊卡哇合成屋 ✨ Chiikawa Merge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入 Matter.js 物理引擎 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <style>
+        /* 引入可爱字体 */
         @import url('https://fonts.googleapis.com/css2?family=Zcool+KuaiLe&family=Fredoka:wght@400;600&display=swap');
 
-        /* 全局样式：Chiikawa 风格配色 */
+        /* 全局样式：Chiikawa 治愈系配色 */
         body {
             font-family: 'Fredoka', 'Zcool KuaiLe', sans-serif;
-            background: linear-gradient(180deg, #fff1eb 0%, #ace0f9 100%); /* 清新的蓝白粉渐变 */
+            background: linear-gradient(180deg, #fffde7 0%, #ffffff 100%);
             overflow: hidden;
             touch-action: none;
             color: #5d4037;
@@ -25,7 +26,7 @@
             -webkit-user-select: none;
         }
 
-        /* 动态背景装饰 - 增加更多可爱元素 */
+        /* 动态背景装饰 */
         .bg-decoration {
             position: absolute;
             z-index: -1;
@@ -33,24 +34,23 @@
             animation: float 8s ease-in-out infinite;
             font-size: 2.5rem;
             pointer-events: none;
-            filter: blur(1px);
+            filter: blur(0.5px);
         }
         @keyframes float {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-30px) rotate(15deg); }
         }
 
-        /* 游戏容器：加宽适配平板 */
+        /* 游戏容器 */
         #game-container {
             position: relative;
             width: 100%; 
             height: 100%;
-            /* 从 600px 增加到 700px，利用率提高 */
-            max-width: 700px; 
+            max-width: 650px; /* 稍微调窄一点以适应大部分平板比例 */
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 0 40px rgba(172, 224, 249, 0.6);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 60px rgba(255, 213, 79, 0.2);
             overflow: hidden;
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
@@ -60,8 +60,9 @@
             #game-container {
                 height: 96vh;
                 margin-top: 2vh;
-                border-radius: 32px;
-                border: 6px solid rgba(255, 255, 255, 0.8);
+                border-radius: 40px;
+                border: 8px solid rgba(255, 255, 255, 0.8);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             }
         }
 
@@ -91,44 +92,59 @@
             padding-top: max(1.5rem, env(safe-area-inset-top));
         }
 
+        /* 分数栏 */
         .score-pill {
-            background: rgba(255, 255, 255, 0.9);
-            color: #88d3ce; /* Chiikawa 蓝绿色 */
+            background: rgba(255, 255, 255, 0.95);
+            color: #ff7043;
             padding: 8px 24px;
-            border-radius: 50px;
+            border-radius: 60px;
             font-size: 1.6rem;
-            font-weight: 800;
-            box-shadow: 0 4px 12px rgba(136, 211, 206, 0.3);
-            border: 3px solid #e0f7fa;
+            font-weight: 900;
+            box-shadow: 0 4px 12px rgba(255, 112, 67, 0.2);
+            border: 3px solid #ffe0b2;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            transition: transform 0.1s;
+        }
+        .score-pill.bump {
+            transform: scale(1.2);
         }
 
+        /* 下一个预览 */
         .next-preview {
             background: #fff;
-            width: 68px;
-            height: 68px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            border: 4px solid #fff59d; /* 黄色边框 */
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            border: 4px solid #fff59d;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
             position: relative;
+            animation: breathe 3s infinite ease-in-out;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .next-preview img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
         }
         .next-preview::after {
-            content: '下个球球';
+            content: 'NEXT';
             position: absolute;
-            bottom: -22px;
+            bottom: -20px;
             font-size: 0.7rem;
-            font-weight: bold;
+            font-weight: 800;
             color: #fff;
-            background: #ffcc80;
-            padding: 3px 10px;
+            background: #ffb74d;
+            padding: 2px 10px;
             border-radius: 12px;
-            white-space: nowrap;
+            letter-spacing: 1px;
         }
 
         /* 按钮通用 */
@@ -138,16 +154,18 @@
             border-radius: 50%;
             width: 48px;
             height: 48px;
-            font-size: 1.4rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-size: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             cursor: pointer;
             pointer-events: auto;
-            color: #ff8a65;
+            color: #ffab91;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.1s;
+            border: 2px solid #ffcc80;
+            transition: all 0.2s;
         }
+        .btn-icon:hover { transform: scale(1.1); }
         .btn-icon:active { transform: scale(0.9); }
 
         .btn-settings {
@@ -155,15 +173,15 @@
             top: max(1.5rem, env(safe-area-inset-top));
             left: 1rem;
             z-index: 20;
-            pointer-events: auto; /* 确保能点到 */
+            pointer-events: auto;
         }
 
         /* 弹窗通用 */
         .screen-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(255, 241, 235, 0.92); /* 暖白背景 */
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -178,240 +196,364 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #81fbb8 0%, #28c76f 100%); /* 清新绿 */
+            background: linear-gradient(135deg, #4dd0e1 0%, #26c6da 100%);
             border: none;
             padding: 16px 48px;
             border-radius: 50px;
             font-size: 1.5rem;
             color: white;
-            font-weight: bold;
+            font-weight: 900;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(40, 199, 111, 0.3);
-            transition: transform 0.2s;
+            box-shadow: 0 8px 20px rgba(38, 198, 218, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
             font-family: inherit;
             margin-top: 1.5rem;
         }
-        .btn-primary:active { transform: scale(0.95); }
+        .btn-primary:active { transform: scale(0.95); box-shadow: 0 4px 10px rgba(38, 198, 218, 0.3); }
 
         .panel-card {
             background: white;
-            padding: 24px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(255, 167, 38, 0.1);
             text-align: center;
-            width: 85%;
+            width: 90%;
             max-width: 400px;
-            border: 3px solid #fff1eb;
+            border: 4px solid #fff9c4;
         }
 
-        /* 滑块样式 */
+        /* 滑块 */
         input[type=range] {
             width: 100%;
             margin: 10px 0;
-            accent-color: #ff8a65;
+            accent-color: #ffab91;
+            height: 6px;
+            border-radius: 3px;
         }
         .setting-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            color: #795548;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #8d6e63;
+            font-weight: 700;
         }
-        .setting-label { width: 60px; text-align: left; }
-
     </style>
 </head>
 <body>
 
-    <!-- 背景装饰物 (Chiikawa 元素) -->
-    <div class="bg-decoration" style="top: 10%; left: 8%;">🍙</div>
-    <div class="bg-decoration" style="top: 25%; right: 10%; animation-delay: 1.5s;">🍡</div>
-    <div class="bg-decoration" style="bottom: 20%; left: 15%; animation-delay: 2.5s;">🍪</div>
-    <div class="bg-decoration" style="bottom: 35%; right: 8%; animation-delay: 0.5s;">⭐</div>
-    <div class="bg-decoration" style="top: 50%; left: 50%; opacity: 0.2; font-size: 8rem;">😺</div>
+    <!-- 背景装饰 (Chiikawa 元素) -->
+    <div class="bg-decoration" style="top: 10%; left: 10%;">⭐</div>
+    <div class="bg-decoration" style="top: 20%; right: 15%; animation-delay: 1s;">🍭</div>
+    <div class="bg-decoration" style="bottom: 15%; left: 20%; animation-delay: 2s; font-size: 3rem;">🍄</div>
+    <div class="bg-decoration" style="bottom: 30%; right: 10%; animation-delay: 3s;">🎀</div>
+    <div class="bg-decoration" style="top: 50%; left: 50%; opacity: 0.1; font-size: 12rem; transform: translate(-50%, -50%);">🐹</div>
 
-    <!-- 游戏容器 -->
     <div id="game-container">
         <canvas id="world"></canvas>
         
-        <!-- 顶部 HUD -->
+        <!-- HUD -->
         <div class="ui-layer">
             <div class="hud-top">
-                <!-- 占位，为了把分数挤到中间或者右边，这里我们用绝对布局或 flex 调整 -->
-                <div style="width: 48px;"></div> <!-- 左侧留空给设置按钮 -->
+                <div style="width: 50px;"></div> <!-- 左侧占位 -->
                 
-                <div class="score-pill">
-                    <span>🌈</span>
+                <div class="score-pill" id="score-container">
+                    <span>🌟</span>
                     <span id="score">0</span>
                 </div>
                 
                 <div class="next-preview">
-                    <span id="next-emoji">✨</span>
+                    <img id="next-image" src="" alt="Next">
                 </div>
             </div>
         </div>
         
-        <!-- 设置按钮 (左上角) -->
+        <!-- 设置按钮 -->
         <button id="btn-settings" class="btn-icon btn-settings">⚙️</button>
 
-        <!-- 设置菜单 (新增) -->
+        <!-- 设置菜单 -->
         <div id="settings-screen" class="screen-overlay hidden">
             <div class="panel-card">
-                <h2 class="text-2xl font-bold mb-6 text-gray-700">设置 🛠️</h2>
+                <h2 class="text-3xl font-bold mb-6" style="color: #ff8a65;">设置 🛠️</h2>
                 
                 <div class="setting-row">
-                    <span class="setting-label">音乐</span>
+                    <span class="setting-label">音乐 (BGM)</span>
                     <input type="range" id="bgm-slider" min="0" max="100" value="30">
-                    <span id="bgm-val">30%</span>
+                    <span id="bgm-val" style="color:#ffab91">30%</span>
                 </div>
                 
                 <div class="setting-row">
-                    <span class="setting-label">音效</span>
+                    <span class="setting-label">音效 (SFX)</span>
                     <input type="range" id="sfx-slider" min="0" max="100" value="60">
-                    <span id="sfx-val">60%</span>
+                    <span id="sfx-val" style="color:#ffab91">60%</span>
                 </div>
 
-                <button class="btn-primary" style="font-size: 1.2rem; padding: 10px 30px;" onclick="closeSettings()">回到游戏</button>
+                <button class="btn-primary" style="background: linear-gradient(135deg, #ffcc80 0%, #ffab91 100%);" onclick="closeSettings()">继续游戏</button>
             </div>
         </div>
 
         <!-- 开始界面 -->
         <div id="start-screen" class="screen-overlay">
-            <div class="text-center mb-4">
-                <span style="font-size: 5rem;">🐹</span>
+            <div class="mb-4 transform scale-150">
+                <!-- 使用生成的 SVG 作为 Logo -->
+                <img src="" id="logo-img" style="width: 100px; height: 100px;">
             </div>
-            <h1 class="text-5xl font-bold mb-2" style="color: #ff8a65; text-shadow: 2px 2px 0px #fff;">萌萌合成屋</h1>
-            <p class="text-gray-400 mb-6 font-bold">Chiikawa Style Edition</p>
+            <h1 class="text-5xl font-bold mb-2 text-center" style="color: #ff8a65; -webkit-text-stroke: 1px white;">吉伊卡哇<br>合成屋</h1>
             
-            <div class="panel-card" style="text-align: left;">
-                <h3 class="text-xl font-bold mb-3" style="color:#28c76f">🎮 玩法介绍:</h3>
-                <ul class="space-y-2 text-gray-600 font-medium">
-                    <li>👆 <strong>点击 / 触摸</strong>：让小可爱下落。</li>
-                    <li>🐹 <strong>合成进化</strong>：相同的角色撞在一起会变身！</li>
-                    <li>⚡ <strong>节奏加快</strong>：这次下落速度变快了哦～</li>
+            <div class="panel-card mt-6 text-left" style="background: rgba(255,255,255,0.8); border:none;">
+                <h3 class="text-xl font-bold mb-3" style="color:#26c6da">🎮 玩法说明:</h3>
+                <ul class="space-y-3 text-gray-600 font-medium text-lg">
+                    <li class="flex items-center"><span class="mr-2">👆</span> 点击屏幕释放角色</li>
+                    <li class="flex items-center"><span class="mr-2">🐹</span> 相同角色碰撞 -> 进化</li>
+                    <li class="flex items-center"><span class="mr-2">🏰</span> 目标：合成巨大的城堡！</li>
                 </ul>
             </div>
             
-            <button class="btn-primary" onclick="startGame()">开始玩耍 ✨</button>
+            <button class="btn-primary" onclick="startGame()">开始游戏 ✨</button>
         </div>
 
-        <!-- 游戏结束界面 -->
+        <!-- 结束界面 -->
         <div id="game-over-screen" class="screen-overlay hidden">
-            <h1 class="text-4xl font-bold mb-2 text-gray-700">哎呀满啦！</h1>
-            <p class="text-xl mb-6 text-gray-500">不要气馁，再来一次～</p>
+            <h1 class="text-4xl font-bold mb-2 text-gray-600">溢出来啦！</h1>
+            <p class="text-lg text-gray-400 mb-6">下次一定能合成城堡～</p>
             
-            <div class="bg-white px-10 py-6 rounded-3xl shadow-sm border-4 border-pink-100 mb-6 text-center">
-                <div class="text-sm text-gray-400 mb-1">最终得分</div>
-                <div class="text-5xl font-bold text-pink-500" id="final-score">0</div>
+            <div class="bg-white px-10 py-6 rounded-3xl shadow-sm border-4 border-pink-100 mb-8 text-center">
+                <div class="text-sm text-gray-400 font-bold tracking-widest">FINAL SCORE</div>
+                <div class="text-6xl font-black mt-2" style="color: #ff8a65;" id="final-score">0</div>
             </div>
             
-            <button class="btn-primary" onclick="resetGame()">再试一次 🌸</button>
+            <button class="btn-primary" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);" onclick="resetGame()">再玩一次 🌸</button>
         </div>
     </div>
 
     <script>
-        // --- 游戏配置：Chiikawa 风格 ---
-        // 颜色选用了更柔和的马卡龙色系
-        // 角色进化链：食物 -> 小可爱 -> 大家伙
-        const TIERS = [
-            { radius: 18, emoji: '🍙', score: 2, color: '#FFFFFF' },    // 0: 饭团 (最基础)
-            { radius: 25, emoji: '🍡', score: 4, color: '#F8BBD0' },    // 1: 三色团子
-            { radius: 34, emoji: '🌰', score: 8, color: '#D7CCC8' },    // 2: 栗子 (栗子馒头)
-            { radius: 44, emoji: '🐹', score: 16, color: '#FFF9C4' },   // 3: 仓鼠 (吉伊)
-            { radius: 56, emoji: '🐱', score: 32, color: '#BBDEFB' },   // 4: 蓝猫 (小八)
-            { radius: 70, emoji: '🐰', score: 64, color: '#FFE0B2' },   // 5: 兔子 (乌萨奇)
-            { radius: 84, emoji: '🦦', score: 128, color: '#FFCC80' },  // 6: 水獭 (师父?)
-            { radius: 98, emoji: '🦁', score: 256, color: '#FFAB91' },  // 7: 狮萨
-            { radius: 115, emoji: '👹', score: 512, color: '#EF9A9A' }, // 8: 讨伐对象 (红)
-            { radius: 135, emoji: '🏰', score: 1024, color: '#E1BEE7' } // 9: 城堡/家
+        // =================================================================
+        // 🎨 Chiikawa SVG 图像生成器
+        // =================================================================
+        
+        function createSVG(content, viewBox="0 0 100 100") {
+            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${content}</svg>`)}`;
+        }
+
+        // 颜色定义 (Variables declared with var to prevent SyntaxError on re-runs)
+        var COLORS = {
+            white: '#FFFFFF',
+            black: '#3e2723',
+            pink: '#f8bbd0',
+            blue: '#b3e5fc',
+            yellow: '#fff59d',
+            orange: '#ffcc80',
+            brown: '#d7ccc8',
+            darkBrown: '#8d6e63',
+            green: '#c8e6c9',
+            red: '#ffcdd2'
+        };
+
+        // 角色SVG路径数据
+        var SVGS = {
+            // 0: 独角仙 (小绿)
+            tier0: createSVG(`
+                <circle cx="50" cy="50" r="45" fill="${COLORS.green}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M50 5 L50 95" stroke="${COLORS.black}" stroke-width="2" opacity="0.3"/>
+                <circle cx="35" cy="40" r="4" fill="${COLORS.black}"/>
+                <circle cx="65" cy="40" r="4" fill="${COLORS.black}"/>
+                <path d="M45 10 L40 25 M55 10 L60 25" stroke="${COLORS.black}" stroke-width="3" fill="none"/>
+            `),
+            // 1: 星星 (黄)
+            tier1: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.yellow}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M50 15 L60 40 L85 40 L65 60 L75 85 L50 70 L25 85 L35 60 L15 40 L40 40 Z" fill="#ffee58" stroke="${COLORS.black}" stroke-width="2"/>
+                <circle cx="40" cy="45" r="3" fill="${COLORS.black}"/>
+                <circle cx="60" cy="45" r="3" fill="${COLORS.black}"/>
+                <path d="M45 55 Q50 60 55 55" stroke="${COLORS.black}" stroke-width="2" fill="none"/>
+            `),
+            // 2: 栗子馒头 (棕)
+            tier2: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.brown}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M10 40 Q50 -10 90 40" fill="${COLORS.darkBrown}" stroke="${COLORS.black}" stroke-width="3"/>
+                <circle cx="35" cy="55" r="4" fill="${COLORS.black}"/>
+                <circle cx="65" cy="55" r="4" fill="${COLORS.black}"/>
+                <path d="M45 60 L55 60" stroke="${COLORS.black}" stroke-width="2"/>
+            `),
+            // 3: 飞鼠 (白蓝)
+            tier3: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.white}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M10 30 Q30 5 50 20 Q70 5 90 30 L90 60 Q70 80 50 60 Q30 80 10 60 Z" fill="${COLORS.blue}" opacity="0.3"/>
+                <path d="M20 20 Q10 10 30 30" stroke="${COLORS.black}" stroke-width="3" fill="none"/> <!-- Ear L -->
+                <path d="M80 20 Q90 10 70 30" stroke="${COLORS.black}" stroke-width="3" fill="none"/> <!-- Ear R -->
+                <circle cx="35" cy="50" r="5" fill="${COLORS.black}"/>
+                <circle cx="65" cy="50" r="5" fill="${COLORS.black}"/>
+                <path d="M48 58 L52 58" stroke="${COLORS.black}" stroke-width="2"/>
+                <circle cx="25" cy="55" r="8" fill="${COLORS.pink}" opacity="0.5"/>
+                <circle cx="75" cy="55" r="8" fill="${COLORS.pink}" opacity="0.5"/>
+            `),
+            // 4: 海獭 (橙)
+            tier4: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.orange}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M30 40 L70 40" stroke="${COLORS.black}" stroke-width="3"/> <!-- Scar/Eyebrow -->
+                <circle cx="35" cy="55" r="4" fill="${COLORS.black}"/>
+                <circle cx="65" cy="55" r="4" fill="${COLORS.black}"/>
+                <path d="M45 65 Q50 70 55 65" stroke="${COLORS.black}" stroke-width="2" fill="none"/>
+                <path d="M80 80 L95 60" stroke="${COLORS.white}" stroke-width="8" stroke-linecap="round"/> <!-- Sword handle hint -->
+            `),
+            // 5: 吉伊 (白粉)
+            tier5: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.white}" stroke="${COLORS.black}" stroke-width="3"/>
+                <circle cx="20" cy="20" r="12" fill="${COLORS.white}" stroke="${COLORS.black}" stroke-width="3"/> <!-- Ear L -->
+                <circle cx="80" cy="20" r="12" fill="${COLORS.white}" stroke="${COLORS.black}" stroke-width="3"/> <!-- Ear R -->
+                <!-- Redraw face over ears -->
+                <circle cx="50" cy="50" r="47" fill="${COLORS.white}"/> 
+                <circle cx="35" cy="55" r="5" fill="${COLORS.black}"/>
+                <circle cx="65" cy="55" r="5" fill="${COLORS.black}"/>
+                <path d="M45 62 Q50 67 55 62" stroke="${COLORS.black}" stroke-width="2" fill="none"/>
+                <circle cx="25" cy="60" r="10" fill="${COLORS.pink}" opacity="0.6"/>
+                <circle cx="75" cy="60" r="10" fill="${COLORS.pink}" opacity="0.6"/>
+            `),
+            // 6: 小八 (蓝白)
+            tier6: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.white}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M20 15 L35 35 L65 35 L80 15 L50 25 Z" fill="${COLORS.blue}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M20 15 L30 5" stroke="${COLORS.black}" stroke-width="3"/> <!-- Ear Tip L -->
+                <path d="M80 15 L70 5" stroke="${COLORS.black}" stroke-width="3"/> <!-- Ear Tip R -->
+                <circle cx="35" cy="55" r="5" fill="${COLORS.black}"/>
+                <circle cx="65" cy="55" r="5" fill="${COLORS.black}"/>
+                <path d="M45 60 Q50 65 55 60" stroke="${COLORS.black}" stroke-width="2" fill="none"/>
+                <path d="M48 62 L50 58 L52 62" stroke="${COLORS.black}" stroke-width="1"/> <!-- Tooth -->
+            `),
+            // 7: 乌萨奇 (黄)
+            tier7: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.yellow}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M15 20 Q10 0 30 10" fill="${COLORS.yellow}" stroke="${COLORS.black}" stroke-width="3"/> <!-- Ear L -->
+                <path d="M85 20 Q90 0 70 10" fill="${COLORS.yellow}" stroke="${COLORS.black}" stroke-width="3"/> <!-- Ear R -->
+                <circle cx="50" cy="50" r="47" fill="${COLORS.yellow}"/>
+                <circle cx="35" cy="50" r="5" fill="${COLORS.black}"/>
+                <circle cx="65" cy="50" r="5" fill="${COLORS.black}"/>
+                <path d="M40 60 Q50 70 60 60" stroke="${COLORS.black}" stroke-width="2" fill="none"/>
+                <circle cx="20" cy="55" r="10" fill="${COLORS.pink}" opacity="0.5"/>
+                <circle cx="80" cy="55" r="10" fill="${COLORS.pink}" opacity="0.5"/>
+                <path d="M40 50 Q50 45 60 50" stroke="${COLORS.black}" stroke-width="2" fill="none" opacity="0.5"/> <!-- Nose line -->
+            `),
+            // 8: 狮萨 (金黄)
+            tier8: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.orange}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M10 20 L20 40 L10 60" stroke="${COLORS.black}" stroke-width="2" fill="none"/> <!-- Mane L -->
+                <path d="M90 20 L80 40 L90 60" stroke="${COLORS.black}" stroke-width="2" fill="none"/> <!-- Mane R -->
+                <circle cx="35" cy="50" r="5" fill="${COLORS.black}"/>
+                <circle cx="65" cy="50" r="5" fill="${COLORS.black}"/>
+                <path d="M35 65 Q50 80 65 65" fill="${COLORS.red}" stroke="${COLORS.black}" stroke-width="2"/> <!-- Mouth -->
+                <circle cx="35" cy="40" r="8" fill="${COLORS.black}" opacity="0.2"/> <!-- Eyebrow -->
+                <circle cx="65" cy="40" r="8" fill="${COLORS.black}" opacity="0.2"/>
+            `),
+            // 9: 奇美拉/大怪物 (粉红)
+            tier9: createSVG(`
+                <circle cx="50" cy="50" r="48" fill="${COLORS.red}" stroke="${COLORS.black}" stroke-width="3"/>
+                <path d="M20 20 L30 40" stroke="${COLORS.black}" stroke-width="4" stroke-linecap="round"/>
+                <path d="M80 20 L70 40" stroke="${COLORS.black}" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="30" cy="50" r="8" fill="${COLORS.white}"/> <circle cx="30" cy="50" r="3" fill="${COLORS.black}"/>
+                <circle cx="70" cy="50" r="8" fill="${COLORS.white}"/> <circle cx="70" cy="50" r="3" fill="${COLORS.black}"/>
+                <path d="M30 70 Q50 85 70 70" stroke="${COLORS.black}" stroke-width="3" fill="none"/>
+                <path d="M30 70 L35 80 M45 75 L48 82 M55 75 L55 82 M65 70 L60 80" stroke="${COLORS.white}" stroke-width="3"/>
+            `)
+        };
+
+        // 游戏配置
+        var TIERS = [
+            { radius: 22, image: SVGS.tier0, score: 2,  color: '#c8e6c9' }, // 独角仙
+            { radius: 30, image: SVGS.tier1, score: 4,  color: '#fff59d' }, // 星星
+            { radius: 40, image: SVGS.tier2, score: 8,  color: '#d7ccc8' }, // 栗子
+            { radius: 50, image: SVGS.tier3, score: 16, color: '#e1f5fe' }, // 飞鼠
+            { radius: 62, image: SVGS.tier4, score: 32, color: '#ffcc80' }, // 海獭
+            { radius: 75, image: SVGS.tier5, score: 64, color: '#ffffff' }, // 吉伊
+            { radius: 88, image: SVGS.tier6, score: 128, color: '#e3f2fd' },// 小八
+            { radius: 102, image:SVGS.tier7, score: 256, color: '#fff9c4' },// 乌萨奇
+            { radius: 118, image:SVGS.tier8, score: 512, color: '#ffe0b2' },// 狮萨
+            { radius: 136, image:SVGS.tier9, score: 1024, color: '#ffcdd2' }// 奇美拉
         ];
 
-        // --- 物理引擎变量 ---
-        const Engine = Matter.Engine,
-              Render = Matter.Render,
-              Runner = Matter.Runner,
-              Bodies = Matter.Bodies,
-              Composite = Matter.Composite,
-              Events = Matter.Events,
-              World = Matter.World;
+        // --- 资源加载 ---
+        // 虽然 SVG 是即时的，但用 Image 对象加载可以缓存
+        var loadedImages = {};
+        
+        function loadResources() {
+            TIERS.forEach((tier, index) => {
+                const img = new Image();
+                img.src = tier.image;
+                loadedImages[index] = img;
+            });
+            // 设置 Start Screen 的 Logo 为 吉伊
+            document.getElementById('logo-img').src = SVGS.tier5;
+        }
 
-        let engine, runner, canvas, ctx;
-        let width, height;
-        let ground, leftWall, rightWall;
+        // --- 物理引擎 ---
+        var Engine = Matter.Engine,
+            Render = Matter.Render,
+            Runner = Matter.Runner,
+            Bodies = Matter.Bodies,
+            Composite = Matter.Composite,
+            Events = Matter.Events,
+            World = Matter.World;
+
+        var engine, runner, canvas, ctx;
+        var width, height;
+        var ground, leftWall, rightWall;
         
         // 游戏状态
-        let nextTier = 0;
-        let score = 0;
-        let isGameActive = false;
-        let isGameOver = false;
-        let canDrop = true;
-        let particles = [];
+        var nextTier = 0;
+        var score = 0;
+        var isGameActive = false;
+        var isGameOver = false;
+        var canDrop = true;
+        var particles = [];
+        var physicsInterval;
         
-        // 音量控制 (0.0 - 1.0)
-        let bgmVolume = 0.3;
-        let sfxVolume = 0.6;
+        // 音量
+        var bgmVolume = 0.3;
+        var sfxVolume = 0.6;
         
-        const WALL_THICKNESS = 100;
-        const DANGER_LINE_OFFSET = 130; 
+        // 墙壁配置：加厚防止穿模
+        var WALL_THICKNESS = 200; 
+        var DANGER_LINE_OFFSET = 140; 
 
-        // --- 音频系统 (Web Audio API) ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let bgmOscillators = []; // 用于存储BGM的振荡器，方便停止
-        let nextNoteTime = 0;
-        let bgmTimerID = null;
-        let isBgmPlaying = false;
+        // --- 音频系统 ---
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var nextNoteTime = 0;
+        var bgmTimerID = null;
+        var isBgmPlaying = false;
 
-        // 简单的旋律序列 (音符频率 + 时长)
-        // 这是一个简单的欢快循环
-        const melody = [
-            {f: 523.25, d: 0.2}, {f: 659.25, d: 0.2}, {f: 783.99, d: 0.2}, {f: 523.25, d: 0.2}, // C E G C
-            {f: 698.46, d: 0.2}, {f: 880.00, d: 0.2}, {f: 698.46, d: 0.2}, {f: 0, d: 0.2},      // F A F -
-            {f: 783.99, d: 0.2}, {f: 987.77, d: 0.2}, {f: 783.99, d: 0.2}, {f: 0, d: 0.2},      // G B G -
-            {f: 523.25, d: 0.4}, {f: 0, d: 0.2}, {f: 523.25, d: 0.2},                           // C - C
+        var melody = [
+            {f: 523.25, d: 0.2}, {f: 659.25, d: 0.2}, {f: 783.99, d: 0.2}, {f: 523.25, d: 0.2},
+            {f: 698.46, d: 0.2}, {f: 880.00, d: 0.2}, {f: 698.46, d: 0.2}, {f: 0, d: 0.2},
+            {f: 783.99, d: 0.2}, {f: 987.77, d: 0.2}, {f: 783.99, d: 0.2}, {f: 0, d: 0.2},
+            {f: 523.25, d: 0.4}, {f: 0, d: 0.2}, {f: 523.25, d: 0.2},
         ];
-        let noteIndex = 0;
+        var noteIndex = 0;
 
-        // BGM 播放逻辑 (八音盒风格)
         function scheduleNote() {
             if (!isBgmPlaying) return;
-            
-            // 如果音频上下文还没准备好
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            const secondsPerBeat = 0.5; // 速度
+            const secondsPerBeat = 0.5;
             const currentTime = audioCtx.currentTime;
-
-            // 预调度音符
             while (nextNoteTime < currentTime + 0.1) {
                 const note = melody[noteIndex];
                 playBgmNote(note.f, nextNoteTime, note.d * secondsPerBeat);
-                nextNoteTime += 0.25; // 固定节拍间隔
-                
+                nextNoteTime += 0.25;
                 noteIndex++;
                 if (noteIndex >= melody.length) noteIndex = 0;
             }
-            
             bgmTimerID = requestAnimationFrame(scheduleNote);
         }
 
         function playBgmNote(freq, time, duration) {
             if (freq <= 0 || bgmVolume <= 0.01) return;
-
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            
-            osc.type = 'sine'; // 正弦波适合可爱的八音盒声音
+            osc.type = 'sine';
             osc.frequency.value = freq;
-            
-            // 包络
             gain.gain.setValueAtTime(0, time);
-            gain.gain.linearRampToValueAtTime(bgmVolume * 0.3, time + 0.05); // 攻击
-            gain.gain.exponentialRampToValueAtTime(0.001, time + duration); // 衰减
-
+            gain.gain.linearRampToValueAtTime(bgmVolume * 0.3, time + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            
             osc.start(time);
             osc.stop(time + duration + 0.1);
         }
@@ -429,64 +571,46 @@
             if (bgmTimerID) cancelAnimationFrame(bgmTimerID);
         }
 
-        // 音效播放
         function playSfx(type) {
             if (sfxVolume <= 0.01) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
-
+            
+            const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
 
-            const now = audioCtx.currentTime;
-
             if (type === 'drop') {
-                // 气泡音
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
-                gain.gain.setValueAtTime(sfxVolume * 0.5, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.15);
+                gain.gain.setValueAtTime(sfxVolume * 0.6, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
                 osc.start(now);
-                osc.stop(now + 0.1);
+                osc.stop(now + 0.15);
             } else if (type === 'merge') {
-                // 亮闪闪的合成音
+                // 更清脆的合成音
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.linearRampToValueAtTime(800, now + 0.1);
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(900, now + 0.1);
                 gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(sfxVolume * 0.4, now + 0.05);
+                gain.gain.linearRampToValueAtTime(sfxVolume * 0.5, now + 0.05);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
                 osc.start(now);
                 osc.stop(now + 0.2);
-                
-                // 加一个泛音
-                const osc2 = audioCtx.createOscillator();
-                const gain2 = audioCtx.createGain();
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(800, now);
-                osc2.frequency.linearRampToValueAtTime(1600, now + 0.1);
-                gain2.gain.setValueAtTime(0, now);
-                gain2.gain.linearRampToValueAtTime(sfxVolume * 0.2, now + 0.05);
-                gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                osc2.connect(gain2);
-                gain2.connect(audioCtx.destination);
-                osc2.start(now);
-                osc2.stop(now + 0.2);
             } else if (type === 'gameover') {
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(300, now);
-                osc.frequency.linearRampToValueAtTime(100, now + 0.5);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.8);
                 gain.gain.setValueAtTime(sfxVolume * 0.5, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                gain.gain.linearRampToValueAtTime(0, now + 0.8);
                 osc.start(now);
-                osc.stop(now + 0.5);
+                osc.stop(now + 0.8);
             }
-
             osc.connect(gain);
             gain.connect(audioCtx.destination);
         }
 
-        // --- 核心初始化 ---
+        // --- 初始化逻辑 ---
         function init() {
             const container = document.getElementById('game-container');
             canvas = document.getElementById('world');
@@ -499,21 +623,22 @@
             ctx = canvas.getContext('2d');
             ctx.scale(dpr, dpr);
 
-            engine = Engine.create();
-            // 优化 4: 增加重力，加快节奏 (1.0 -> 1.6)
-            engine.world.gravity.y = 1.6; 
+            // 物理引擎配置
+            engine = Engine.create({
+                enableSleeping: true // 优化性能
+            });
+            engine.world.gravity.y = 1.6; // 维持快节奏
 
             createBoundaries();
+            loadResources();
 
-            runner = Runner.create();
+            // 碰撞监听
             Events.on(engine, 'collisionStart', handleCollisions);
+
+            // 输入监听
             setupInputs(container);
-            
-            requestAnimationFrame(renderLoop);
-            prepareNextItem();
-            updateScore(0);
-            
-            // 绑定设置滑块事件
+
+            // 绑定设置条
             document.getElementById('bgm-slider').addEventListener('input', (e) => {
                 bgmVolume = e.target.value / 100;
                 document.getElementById('bgm-val').innerText = e.target.value + '%';
@@ -522,76 +647,104 @@
                 sfxVolume = e.target.value / 100;
                 document.getElementById('sfx-val').innerText = e.target.value + '%';
             });
+
+            // 启动渲染循环
+            requestAnimationFrame(renderLoop);
+            
+            // 初始化下一个球
+            prepareNextItem();
+            updateScore(0);
         }
 
         function createBoundaries() {
             if(ground) World.remove(engine.world, [ground, leftWall, rightWall]);
+            
+            const wallOpts = { 
+                isStatic: true, 
+                friction: 0.1, 
+                restitution: 0.2,
+                render: { visible: false }
+            };
 
-            const wallOptions = { isStatic: true, friction: 0.1, restitution: 0.1 };
-            ground = Bodies.rectangle(width/2, height + WALL_THICKNESS/2, width, WALL_THICKNESS, wallOptions);
-            leftWall = Bodies.rectangle(0 - WALL_THICKNESS/2, height/2, WALL_THICKNESS, height * 2, wallOptions);
-            rightWall = Bodies.rectangle(width + WALL_THICKNESS/2, height/2, WALL_THICKNESS, height * 2, wallOptions);
+            // 墙壁加厚
+            ground = Bodies.rectangle(width/2, height + WALL_THICKNESS/2, width + 200, WALL_THICKNESS, wallOpts);
+            leftWall = Bodies.rectangle(0 - WALL_THICKNESS/2, height/2, WALL_THICKNESS, height * 2, wallOpts);
+            rightWall = Bodies.rectangle(width + WALL_THICKNESS/2, height/2, WALL_THICKNESS, height * 2, wallOpts);
 
             World.add(engine.world, [ground, leftWall, rightWall]);
         }
 
-        // --- 游戏流程 ---
+        // --- 游戏控制 ---
         function startGame() {
+            // 尝试唤醒音频环境 (iOS需要)
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             document.getElementById('start-screen').classList.add('hidden');
             isGameActive = true;
-            Runner.run(runner, engine);
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            startBGM(); // 开始播放音乐
+            
+            // 使用自定义 Runner 循环来确保稳定
+            if (physicsInterval) clearInterval(physicsInterval);
+            physicsInterval = setInterval(() => {
+                Engine.update(engine, 1000 / 60);
+            }, 1000 / 60);
+
+            startBGM();
         }
 
         function resetGame() {
-            World.clear(engine.world);
-            Engine.clear(engine);
-            createBoundaries();
-            
+            // 清理实体但保留墙壁
+            Composite.clear(engine.world, false, true); // keepStatic=true
+            createBoundaries(); // 重新确保墙壁位置正确
+
             score = 0;
             updateScore(0);
             isGameOver = false;
             canDrop = true;
-            document.getElementById('game-over-screen').classList.add('hidden');
+            particles = [];
             
+            document.getElementById('game-over-screen').classList.add('hidden');
             startGame();
             prepareNextItem();
         }
 
-        // --- 游戏逻辑 ---
         function prepareNextItem() {
+            // 只生成前4种小球
             nextTier = Math.floor(Math.random() * 4);
-            document.getElementById('next-emoji').innerText = TIERS[nextTier].emoji;
+            const imgEl = document.getElementById('next-image');
+            imgEl.src = loadedImages[nextTier].src;
+            
+            // 触发动画
+            const previewBox = document.querySelector('.next-preview');
+            previewBox.classList.remove('breathe'); // reset
+            void previewBox.offsetWidth; // trigger reflow
+            previewBox.style.animation = 'none';
+            setTimeout(() => { previewBox.style.animation = 'breathe 3s infinite ease-in-out'; }, 10);
         }
 
         function spawnCurrentItem(x) {
             if (!isGameActive || !canDrop || isGameOver) return;
-            
-            // 点击设置按钮区域不触发下落
             if (document.getElementById('settings-screen').style.opacity === '1') return;
 
             canDrop = false;
             playSfx('drop');
 
             const radius = TIERS[nextTier].radius;
-            x = Math.max(radius + 15, Math.min(width - radius - 15, x));
+            // 边界检查，防止球生成在墙里
+            x = Math.max(radius + 10, Math.min(width - radius - 10, x));
 
             const body = Bodies.circle(x, 60, radius, {
-                restitution: 0.3, 
-                friction: 0.01,  // 稍微增加一点摩擦，防止球球太滑
-                frictionAir: 0.01, // 空气阻力
-                label: `item-${nextTier}`,
-                render: { fillStyle: TIERS[nextTier].color }
+                restitution: 0.25,
+                friction: 0.02,
+                frictionAir: 0.005, // 稍微减少空气阻力，掉落更快
+                density: 0.002, // 调整密度
+                label: `item-${nextTier}`
             });
             
             body.tier = nextTier;
-            body.emoji = TIERS[nextTier].emoji;
-
             World.add(engine.world, body);
 
-            // 优化 4: 加快下落频率 (600ms -> 450ms)
-            setTimeout(() => { canDrop = true; }, 450); 
+            // 冷却时间
+            setTimeout(() => { canDrop = true; }, 400);
             prepareNextItem();
         }
 
@@ -604,37 +757,47 @@
                     if(bodyA.isRemoved || bodyB.isRemoved) continue;
 
                     const newTier = bodyA.tier + 1;
-                    const midX = (bodyA.position.x + bodyB.position.x) / 2;
-                    const midY = (bodyA.position.y + bodyB.position.y) / 2;
-
+                    
+                    // 移除旧球
                     World.remove(engine.world, [bodyA, bodyB]);
                     bodyA.isRemoved = true;
                     bodyB.isRemoved = true;
 
+                    // 计算中点
+                    const midX = (bodyA.position.x + bodyB.position.x) / 2;
+                    const midY = (bodyA.position.y + bodyB.position.y) / 2;
+
+                    // 满级判定
                     if (newTier >= TIERS.length) {
-                        createParticles(midX, midY, '#FFD700', 30);
+                        createParticles(midX, midY, '#FFD700', 40);
                         updateScore(score + TIERS[bodyA.tier].score * 4);
                         playSfx('merge');
                         continue;
                     }
 
+                    // 生成新球
                     const newBody = Bodies.circle(midX, midY, TIERS[newTier].radius, {
                         restitution: 0.2,
+                        friction: 0.02,
                         label: `item-${newTier}`
                     });
                     newBody.tier = newTier;
-                    newBody.emoji = TIERS[newTier].emoji;
 
                     World.add(engine.world, newBody);
                     
-                    createParticles(midX, midY, TIERS[newTier].color, 15);
+                    createParticles(midX, midY, TIERS[newTier].color, 12);
                     updateScore(score + TIERS[newTier].score * 2);
                     playSfx('merge');
+                    
+                    // UI跳动
+                    const scoreEl = document.getElementById('score-container');
+                    scoreEl.classList.add('bump');
+                    setTimeout(() => scoreEl.classList.remove('bump'), 100);
                 }
             }
         }
 
-        // --- 输入 & 交互 ---
+        // --- 输入处理 ---
         function setupInputs(element) {
             let currentX = width / 2;
 
@@ -647,14 +810,14 @@
                 if(!isGameActive) return;
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 updateX(clientX);
-                e.preventDefault();
+                e.preventDefault(); // 防止滚动
             };
 
             const handleEnd = (e) => {
-                // 如果点到了设置按钮，不触发
+                if (audioCtx.state === 'suspended') audioCtx.resume(); // 再次尝试唤醒音频
+                
                 const target = e.target;
                 if (target.closest('.btn-settings') || target.closest('.screen-overlay')) return;
-
                 if(!isGameActive) return;
                 spawnCurrentItem(currentX);
             };
@@ -667,29 +830,24 @@
             element.getCurrentInputX = () => currentX;
         }
 
-        // 设置菜单逻辑
         const settingsBtn = document.getElementById('btn-settings');
         const settingsScreen = document.getElementById('settings-screen');
-        
         settingsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             if(!isGameActive) return;
             settingsScreen.classList.remove('hidden');
-            // 暂停物理引擎? 还是保持运行增加紧张感? 
-            // 保持运行比较简单，且防止作弊
         });
-
         function closeSettings() {
             settingsScreen.classList.add('hidden');
         }
 
-        // --- 渲染 & 特效 ---
+        // --- 渲染循环 ---
         function createParticles(x, y, color, count) {
             for(let i=0; i<count; i++) {
                 particles.push({
                     x: x, y: y,
-                    vx: (Math.random() - 0.5) * 15,
-                    vy: (Math.random() - 0.5) * 15,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.5) * 12,
                     life: 1.0,
                     color: color,
                     size: Math.random() * 6 + 2
@@ -705,16 +863,22 @@
         function checkGameOver() {
             if(!isGameActive) return;
             const bodies = Composite.allBodies(engine.world);
+            
             for (let body of bodies) {
                 if (!body.isStatic && body.tier !== undefined) {
-                    if (body.position.y < DANGER_LINE_OFFSET && Math.abs(body.velocity.y) < 0.2) {
+                    // 判定更严格：球必须在危险线之上，且速度很慢（堆积状态）
+                    if (body.position.y < DANGER_LINE_OFFSET && Math.abs(body.velocity.y) < 0.2 && Math.abs(body.velocity.x) < 0.2) {
                         if(!body.dangerTimer) body.dangerTimer = Date.now();
-                        if (Date.now() - body.dangerTimer > 1500) {
+                        
+                        // 持续2秒处于危险状态才结束
+                        if (Date.now() - body.dangerTimer > 2000) {
                             isGameOver = true;
                             isGameActive = false;
-                            Runner.stop(runner);
-                            stopBGM(); // 停止音乐
+                            
+                            clearInterval(physicsInterval); // 停止物理计算
+                            stopBGM();
                             playSfx('gameover');
+                            
                             document.getElementById('game-over-screen').classList.remove('hidden');
                             document.getElementById('final-score').innerText = score;
                             return;
@@ -734,46 +898,43 @@
                 ctx.beginPath();
                 ctx.moveTo(0, DANGER_LINE_OFFSET);
                 ctx.lineTo(width, DANGER_LINE_OFFSET);
-                ctx.strokeStyle = "rgba(255, 107, 129, 0.5)";
-                ctx.setLineDash([12, 12]);
-                ctx.lineWidth = 4;
+                ctx.strokeStyle = "rgba(255, 112, 67, 0.4)";
+                ctx.setLineDash([10, 10]);
+                ctx.lineWidth = 3;
                 ctx.stroke();
                 ctx.setLineDash([]);
+                
+                // 绘制“Danger”文字
+                ctx.fillStyle = "rgba(255, 112, 67, 0.4)";
+                ctx.font = "14px Fredoka";
+                ctx.fillText("WARNING", 10, DANGER_LINE_OFFSET - 5);
             }
 
-            // 绘制预览
+            // 绘制预览线和球
             if (isGameActive && !isGameOver) {
                 const container = document.getElementById('game-container');
                 const inputX = container.getCurrentInputX ? container.getCurrentInputX() : width/2;
                 const r = TIERS[nextTier].radius;
                 const clampX = Math.max(r + 2, Math.min(width - r - 2, inputX));
 
-                // 虚线辅助线
                 ctx.beginPath();
                 ctx.moveTo(clampX, 60);
                 ctx.lineTo(clampX, height);
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
                 ctx.lineWidth = 2;
-                ctx.setLineDash([5, 5]);
+                ctx.setLineDash([6, 6]);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                if(canDrop) {
+                if(canDrop && loadedImages[nextTier]) {
                     ctx.globalAlpha = 0.8;
-                    ctx.beginPath();
-                    ctx.arc(clampX, 60, r, 0, Math.PI*2);
-                    ctx.fillStyle = TIERS[nextTier].color;
-                    ctx.fill();
-                    
-                    ctx.font = `${r}px serif`;
-                    ctx.textAlign = "center";
-                    ctx.textBaseline = "middle";
-                    ctx.fillText(TIERS[nextTier].emoji, clampX, 60 + r * 0.1);
+                    const img = loadedImages[nextTier];
+                    ctx.drawImage(img, clampX - r, 60 - r, r * 2, r * 2);
                     ctx.globalAlpha = 1.0;
                 }
             }
 
-            // 绘制物理球
+            // 绘制实体
             const bodies = Composite.allBodies(engine.world);
             for (let body of bodies) {
                 if (body.isStatic) continue;
@@ -782,43 +943,30 @@
                 ctx.translate(body.position.x, body.position.y);
                 ctx.rotate(body.angle);
 
-                // 球体
-                ctx.beginPath();
-                ctx.arc(0, 0, r, 0, 2 * Math.PI);
-                ctx.fillStyle = TIERS[body.tier].color;
-                ctx.fill();
-
-                // 内部发光（增加质感）
-                const grad = ctx.createRadialGradient(-r*0.2, -r*0.2, r*0.1, 0, 0, r);
-                grad.addColorStop(0, "rgba(255,255,255,0.4)");
-                grad.addColorStop(1, "rgba(255,255,255,0)");
-                ctx.fillStyle = grad;
-                ctx.fill();
-
-                // 描边
-                ctx.beginPath();
-                ctx.arc(0, 0, r, 0, 2 * Math.PI);
-                ctx.strokeStyle = "rgba(0,0,0,0.1)";
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // Emoji
-                ctx.fillStyle = "#000";
-                ctx.font = `${r * 1.15}px serif`;
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(body.emoji, 0, r * 0.12);
+                // 绘制图片
+                if (loadedImages[body.tier]) {
+                    const img = loadedImages[body.tier];
+                    // 稍微放大一点点图片以覆盖物理边缘
+                    const visualSize = r * 2.05; 
+                    ctx.drawImage(img, -visualSize/2, -visualSize/2, visualSize, visualSize);
+                } else {
+                    // Fallback
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r, 0, 2 * Math.PI);
+                    ctx.fillStyle = TIERS[body.tier].color;
+                    ctx.fill();
+                }
 
                 ctx.rotate(-body.angle);
                 ctx.translate(-body.position.x, -body.position.y);
             }
 
-            // 粒子
+            // 粒子特效
             for(let i=particles.length-1; i>=0; i--) {
                 let p = particles[i];
                 p.x += p.vx;
                 p.y += p.vy;
-                p.life -= 0.025;
+                p.life -= 0.03;
                 p.vy += 0.5;
 
                 if(p.life <= 0) {
@@ -838,18 +986,28 @@
             requestAnimationFrame(renderLoop);
         }
 
+        // 窗口大小适配
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-             width = document.getElementById('game-container').clientWidth;
-             height = document.getElementById('game-container').clientHeight;
-             canvas.width = width * (window.devicePixelRatio || 1);
-             canvas.height = height * (window.devicePixelRatio || 1);
-             ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
-             createBoundaries();
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // 重新获取尺寸
+                const container = document.getElementById('game-container');
+                width = container.clientWidth;
+                height = container.clientHeight;
+                
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.scale(dpr, dpr);
+                
+                createBoundaries();
+            }, 200);
         });
 
+        // 启动
         window.onload = init;
 
     </script>
 </body>
-
 </html>
